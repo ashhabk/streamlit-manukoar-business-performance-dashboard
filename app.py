@@ -4,18 +4,15 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
-# Inject CSS styling for soft gradient and card shadows
+# ✅ THIS MUST COME BEFORE ANYTHING ELSE
+st.set_page_config(page_title="Manukora Dashboard", layout="wide")
+
+# Then inject your custom CSS
 st.markdown("""
     <style>
-        /* === Background color & layout === */
         .stApp {
             background: linear-gradient(to bottom right, #ffffff, #f9f9f9);
             font-family: 'Segoe UI', sans-serif;
-        }
-
-        /* === Custom card styling === */
-        .block-container {
-            padding-top: 2rem;
         }
 
         .metric-container {
@@ -26,12 +23,10 @@ st.markdown("""
             margin-bottom: 1.5rem;
         }
 
-        /* === Custom section headers === */
         h2, h3 {
             color: #f26522 !important;
         }
 
-        /* === Logo spacing === */
         .logo-container {
             display: flex;
             align-items: center;
@@ -40,7 +35,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.set_page_config(page_title="Manukora Dashboard", layout="wide")
 # --- DATA LOAD ---
 df_a = pd.read_csv("data/final_dataset_a.csv")
 df_b = pd.read_csv("data/final_dataset_b.csv")
