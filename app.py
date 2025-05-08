@@ -6,6 +6,20 @@ from plotly.subplots import make_subplots
 from datetime import datetime
 # ✅ THIS MUST COME BEFORE ANYTHING ELSE
 st.set_page_config(page_title="Manukora Dashboard", layout="wide")
+# 🧩 background
+st.markdown(
+    """
+    <style>
+        .stApp {
+            background-image: url("background.png");
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # Then inject your custom CSS
 # Custom styling
