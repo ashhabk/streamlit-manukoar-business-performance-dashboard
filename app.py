@@ -7,6 +7,28 @@ from datetime import datetime
 # ✅ THIS MUST COME BEFORE ANYTHING ELSE
 st.set_page_config(page_title="Manukora Dashboard", layout="wide")
 # 🧩 background
+import base64
+
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+bg_img = get_base64_of_bin_file("assets/background.jpg")
+st.markdown(
+    f"""
+    <style>
+        .stApp {{
+            background-image: url("data:image/jpg;base64,{bg_img}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.markdown(
     """
     <style>
