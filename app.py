@@ -145,7 +145,7 @@ def label_segment(row):
 cust_summary["cluster_label"] = cust_summary.apply(label_segment, axis=1)
 segment_counts = cust_summary["cluster_label"].value_counts().reset_index()
 segment_counts.columns = ["Customer Type", "Count"]
-# === ROW 3: Combined Monthly Trends ===
+# === ROW 1: Combined Monthly Trends ===
 fig = go.Figure()
 fig.add_trace(go.Bar(x=summary['month'], y=summary['total_price'], name='Revenue', marker_color='#FFC301', yaxis='y'))
 fig.add_trace(go.Scatter(x=summary['month'], y=summary['orders'], mode='lines+markers', name='Orders', marker=dict(color='#2E86AB'), yaxis='y2'))
@@ -161,25 +161,6 @@ fig.update_layout(
     legend=dict(title='Metric', x=1.05, y=1)
 )
 st.plotly_chart(fig, use_container_width=True)
-# === ROW 1 ===
-col4, col5, col6 = st.columns(3)
-with col4:
-    with st.container():
-        fig1 = px.line(roas_data, x="month", y="ROAS", color="attributed_channel", title="ROAS Trend by Channel")
-        fig1.update_layout(paper_bgcolor="white",plot_bgcolor="white")
-        st.plotly_chart(fig1, use_container_width=True)
-
-with col5:
-    with st.container():
-        fig2 = px.line(roas_data, x="month", y="CAC", color="attributed_channel", title="Customer Acquisition Cost (CAC)")
-        fig2.update_layout(paper_bgcolor="white",plot_bgcolor="white")
-        st.plotly_chart(fig2, use_container_width=True)
-
-with col6:
-    with st.container():
-        fig3 = px.pie(segment_counts, names="Customer Type", values="Count", hole=0.4, title="Customer Segmentation")
-        fig3.update_layout(paper_bgcolor="white")
-        st.plotly_chart(fig3, use_container_width=True)
 
 # === ROW 2 ===
 col7, col8, col9 = st.columns(3)
@@ -201,6 +182,26 @@ with col9:
                   color_discrete_sequence=["#F26522"])
     fig6.update_layout(paper_bgcolor="white", plot_bgcolor="white")
     st.plotly_chart(fig6, use_container_width=True)
+    
+# === ROW 3 CAC , ROAS & CLUSTERING ===
+col4, col5, col6 = st.columns(3)
+with col4:
+    with st.container():
+        fig1 = px.line(roas_data, x="month", y="ROAS", color="attributed_channel", title="ROAS Trend by Channel")
+        fig1.update_layout(paper_bgcolor="white",plot_bgcolor="white")
+        st.plotly_chart(fig1, use_container_width=True)
+
+with col5:
+    with st.container():
+        fig2 = px.line(roas_data, x="month", y="CAC", color="attributed_channel", title="Customer Acquisition Cost (CAC)")
+        fig2.update_layout(paper_bgcolor="white",plot_bgcolor="white")
+        st.plotly_chart(fig2, use_container_width=True)
+
+with col6:
+    with st.container():
+        fig3 = px.pie(segment_counts, names="Customer Type", values="Count", hole=0.4, title="Customer Segmentation")
+        fig3.update_layout(paper_bgcolor="white")
+        st.plotly_chart(fig3, use_container_width=True)
 
 
 # === FOOTER ===
