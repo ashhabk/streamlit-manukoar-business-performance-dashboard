@@ -3,8 +3,10 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-# Page setup
-st.set_page_config(page_title="Manukora BI Dashboard", layout="wide")
+# ✅ SET PAGE CONFIG FIRST
+st.set_page_config(layout='wide', page_title="Manukora Dashboard")
+
+# Now continue with other Streamlit code:
 st.title("📊 Manukora Marketing & Customer Dashboard")
 
 # Load data
