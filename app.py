@@ -48,6 +48,11 @@ delta_newcust = (latest["new_customers"] - prev["new_customers"]) / prev["new_cu
 
 # === XYZ Spend ===
 first_orders = df_a[df_a["order_rank"] == 1]
+first_order_channel = first_orders.groupby("attributed_channel").agg(
+    new_customers=("customer_id", "nunique"),
+    revenue=("total_price", "sum")
+).reset_index()
+
 xyz_orders = df_a[df_a['attributed_channel'] == 'XYZ media']
 xyz_commission = xyz_orders.groupby('month')['total_price'].sum().reset_index()
 xyz_commission['commission_spend'] = xyz_commission['total_price'] * 0.10
