@@ -4,49 +4,53 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
-# === SET PAGE CONFIG FIRST ===
+# === PAGE CONFIG ===
 st.set_page_config(page_title="Manukora Dashboard", layout="wide")
 
-# === BASE PAGE STYLE (NO IMAGE) ===
-st.markdown("""
-    <style>
-        .stApp {
-            background-color: #FFF8EF;
-            font-family: 'Segoe UI', sans-serif;
-        }
+# === STYLING ===
+background_color = "#FFF7ED"  # light creamy orange
+chart_bg_color = "#FFF1DC"  # slightly darker for chart cards
+accent_orange = "#F26522"  # logo orange
 
-        h1 {
-            margin-top: 0;
-            font-weight: 800;
-        }
-
-        .orange-title {
-            background-color: #f06529;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-        }
-
-        .block-container {
-            padding: 2rem 3rem;
-        }
-
-        .stPlotlyChart > div {
-            border-radius: 12px;
-            padding: 10px;
-        }
-    </style>
+st.markdown(f"""
+<style>
+    .stApp {{
+        background-color: {background_color};
+    }}
+    .title-block {{
+        background-color: {accent_orange};
+        padding: 1rem 2rem;
+        margin-bottom: 1rem;
+    }}
+    .title-block h1 {{
+        color: black;
+        font-weight: 900;
+        font-size: 32px;
+        margin: 0;
+    }}
+    .element-container .stMetric {{
+        text-align: center !important;
+    }}
+    .stPlotlyChart {{
+        padding: 0.5rem 0;
+    }}
+    .stPlotlyChart > div {{
+        background-color: {chart_bg_color};
+        border-radius: 10px;
+        padding: 1rem;
+    }}
+</style>
 """, unsafe_allow_html=True)
 
 # === LOAD DATA ===
 df_a = pd.read_csv("data/final_dataset_a.csv")
 df_b = pd.read_csv("data/final_dataset_b.csv")
-
 df_a['created_at'] = pd.to_datetime(df_a['created_at'], errors='coerce')
 df_a = df_a.dropna(subset=['created_at'])
 df_a['month'] = df_a['created_at'].dt.to_period("M").astype(str)
 df_b['month'] = pd.to_datetime(df_b['date'], errors='coerce').dt.to_period("M").astype(str)
 
-# === METRICS DATA ===
+# === METRICS ===
 monthly_rev = df_a.groupby("month")["total_price"].sum().reset_index()
 monthly_orders = df_a.groupby("month")["order_id"].count().reset_index(name="orders")
 monthly_new = df_a[df_a["order_rank"] == 1].groupby("month")["customer_id"].nunique().reset_index(name="new_customers")
@@ -74,6 +78,7 @@ acq = first_orders.groupby(["month", "attributed_channel"]).agg(
     new_customers=("customer_id", "nunique"),
     revenue=("total_price", "sum")
 ).reset_index()
+
 spend = df_b_updated.groupby(["month", "channel"]).agg(spend=("spend", "sum")).reset_index()
 roas_data = pd.merge(acq, spend, left_on=['month', 'attributed_channel'], right_on=['month', 'channel'], how='inner')
 roas_data['CAC'] = roas_data['spend'] / roas_data['new_customers']
@@ -130,84 +135,52 @@ segment_counts = cust_summary["cluster_label"].value_counts().reset_index()
 segment_counts.columns = ["Customer Type", "Count"]
 
 # === HEADER ===
-col_logo, col_title = st.columns([1, 6])
+col_logo, col_title = st.columns([1, 10])
 with col_logo:
     st.image("assets/logo.png", width=60)
 with col_title:
-    st.markdown(
-        """
-        <div class="orange-title">
-            <h1 style='color: black;'>Manukora Business Performance Dashboard</h1>
-        </div>
-        """, unsafe_allow_html=True
-    )
+    st.markdown(f"""<div class='title-block'><h1>Manukora Business Performance Dashboard</h1></div>""", unsafe_allow_html=True)
 
-# === CENTERED SCORECARDS ===
-st.markdown("<br>", unsafe_allow_html=True)
-col1, col2, col3 = st.columns([1, 1, 1])
-with col1:
-    st.metric("Revenue", f"${latest['total_price']:,.0f}", f"{delta_rev:.1%}")
-with col2:
-    st.metric("New Customers", f"{latest['new_customers']:,.0f}", f"{delta_newcust:.1%}")
-with col3:
-    st.metric("Orders", f"{latest['orders']:,.0f}", f"{delta_orders:.1%}")
+# === SCORECARDS ===
+col1, col2, col3 = st.columns(3)
+col1.metric("Revenue", f"${latest['total_price']:,.0f}", f"{delta_rev:.1%}")
+col2.metric("New Customers", f"{latest['new_customers']:,.0f}", f"{delta_newcust:.1%}")
+col3.metric("Orders", f"{latest['orders']:,.0f}", f"{delta_orders:.1%}")
 
-# === CHART COLOR STYLE ===
-chart_bg = "#FFFCF5"
-
-def apply_style(fig):
-    fig.update_layout(
-        plot_bgcolor=chart_bg,
-        paper_bgcolor=chart_bg,
-        font=dict(color="black"),
-        title_font=dict(size=16),
-        margin=dict(l=10, r=10, t=40, b=10),
-    )
-    return fig
-
-# === CHARTS ROW 1 ===
+# === ROW 1 ===
 col4, col5, col6 = st.columns(3)
 with col4:
-    fig1 = px.line(roas_data, x="month", y="ROAS", color="attributed_channel", title="ROAS Trend by Channel")
-    st.plotly_chart(apply_style(fig1), use_container_width=True)
+    st.plotly_chart(px.line(roas_data, x="month", y="ROAS", color="attributed_channel", title="ROAS Trend by Channel"), use_container_width=True)
 with col5:
-    fig2 = px.line(roas_data, x="month", y="CAC", color="attributed_channel", title="CAC Trend by Channel")
-    st.plotly_chart(apply_style(fig2), use_container_width=True)
+    st.plotly_chart(px.line(roas_data, x="month", y="CAC", color="attributed_channel", title="Customer Acquisition Cost (CAC)"), use_container_width=True)
 with col6:
-    fig3 = px.pie(segment_counts, names="Customer Type", values="Count", hole=0.4, title="Customer Segmentation")
-    fig3.update_traces(textinfo='percent+label')
-    st.plotly_chart(apply_style(fig3), use_container_width=True)
+    st.plotly_chart(px.pie(segment_counts, names="Customer Type", values="Count", hole=0.4, title="Customer Segmentation"), use_container_width=True)
 
-# === CHARTS ROW 2 ===
+# === ROW 2 ===
 col7, col8, col9 = st.columns(3)
 with col7:
-    fig4 = px.bar(first_orders.groupby("attributed_channel")["customer_id"].nunique().reset_index(name="new_customers"),
-                  x="attributed_channel", y="new_customers", title="New Customers by Channel")
-    st.plotly_chart(apply_style(fig4), use_container_width=True)
+    st.plotly_chart(px.bar(first_orders.groupby("attributed_channel")["customer_id"].nunique().reset_index(name="new_customers"), 
+                           x="attributed_channel", y="new_customers", title="New Customers by Channel", text_auto=".2s"), use_container_width=True)
 with col8:
-    fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Avg Order Value by Discount")
-    st.plotly_chart(apply_style(fig5), use_container_width=True)
+    st.plotly_chart(px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Average Order Value by Discount", text_auto=".2f"), use_container_width=True)
 with col9:
-    fig6 = px.bar(revenue_summary, x="customer_type", y="total_revenue", title="Revenue: New vs Returning")
-    st.plotly_chart(apply_style(fig6), use_container_width=True)
+    st.plotly_chart(px.bar(revenue_summary, x="customer_type", y="total_revenue", title="Revenue: New vs. Returning", text_auto=".2s"), use_container_width=True)
 
-# === ROW 3: COMBINED MONTHLY ===
+# === ROW 3 ===
 fig = go.Figure()
-fig.add_trace(go.Bar(x=summary['month'], y=summary['total_price'], name='Revenue', marker_color='#f06529', yaxis='y'))
-fig.add_trace(go.Scatter(x=summary['month'], y=summary['orders'], name='Orders', yaxis='y2', mode='lines+markers'))
-fig.add_trace(go.Scatter(x=summary['month'], y=summary['new_customers'], name='New Customers', yaxis='y2', mode='lines+markers'))
-
+fig.add_trace(go.Bar(x=summary['month'], y=summary['total_price'], name='Revenue', marker_color=accent_orange, yaxis='y'))
+fig.add_trace(go.Scatter(x=summary['month'], y=summary['orders'], mode='lines+markers', name='Orders', yaxis='y2', marker=dict(color='blue')))
+fig.add_trace(go.Scatter(x=summary['month'], y=summary['new_customers'], mode='lines+markers', name='New Customers', yaxis='y2', marker=dict(color='red')))
 fig.update_layout(
     title='📈 Monthly Revenue, Orders, and New Customers',
     xaxis=dict(title='Month'),
     yaxis=dict(title='Revenue (USD)', showgrid=False),
     yaxis2=dict(title='Orders / Customers', overlaying='y', side='right', showgrid=False),
-    plot_bgcolor=chart_bg,
-    paper_bgcolor=chart_bg,
+    plot_bgcolor=chart_bg_color,
+    paper_bgcolor=chart_bg_color,
     height=500,
-    legend=dict(x=1.05, y=1)
+    legend=dict(title='Metric', x=1.05, y=1, xanchor='left', yanchor='top')
 )
-
 st.plotly_chart(fig, use_container_width=True)
 
 # === FOOTER ===
