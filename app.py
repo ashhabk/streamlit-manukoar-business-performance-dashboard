@@ -39,10 +39,6 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-with col1:
-    st.markdown("<div class='metric-container'>", unsafe_allow_html=True)
-    st.metric("Revenue", f"${latest['total_price']:,.2f}", f"{delta_rev:.1%}")
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # --- DATA LOAD ---
 df_a = pd.read_csv("data/final_dataset_a.csv")
