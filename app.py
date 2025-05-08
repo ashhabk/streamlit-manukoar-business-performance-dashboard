@@ -6,7 +6,7 @@ from datetime import datetime
 
 # === CONFIGURATION ===
 st.set_page_config(page_title="Manukora Dashboard", layout="wide")
-bg_color = "#FFF5EB"  # light beige color
+bg_color = "#FFF6EB"  # light beige color
 
 # === CUSTOM STYLE ===
 st.markdown(f"""
@@ -18,7 +18,7 @@ st.markdown(f"""
             padding-top: 0rem;
         }}
         .title-bar {{
-            background-color: #F26522;
+            background-color: #FFC300;
             padding: 1.5rem;
             border-radius: 8px;
             text-align: center;
