@@ -88,15 +88,26 @@ segment_counts = cust_summary["cluster_label"].value_counts().reset_index()
 segment_counts.columns = ["Customer Type", "Count"]
 
 # --- ROAS and CAC ---
+xyz_orders = df_a[df_a['attributed_channel'] == 'XYZ media']
+xyz_commission = xyz_orders.groupby('month')['total_price'].sum().reset_index()
+xyz_commission['commission_spend'] = xyz_commission['total_price'] * 0.10
+
+xyz_commission['flat_fee'] = 3000
+xyz_commission['spend'] = xyz_commission['commission_spend'] + xyz_commission['flat_fee']
+xyz_commission['channel'] = 'XYZ media'
+
+xyz_spend = xyz_commission[['month', 'channel', 'spend']]
+df_b_updated = pd.concat([df_b, xyz_spend], ignore_index=True)
+
 acq = first_orders.groupby(["month", "attributed_channel"]).agg(
     new_customers=("customer_id", "nunique"),
     revenue=("total_price", "sum")
 ).reset_index()
 
-spend = df_b.groupby(["month", "channel"]).agg(spend=("spend", "sum")).reset_index()
-roas_data = pd.merge(acq, spend, left_on=["month", "attributed_channel"], right_on=["month", "channel"], how="inner")
-roas_data["CAC"] = roas_data["spend"] / roas_data["new_customers"]
-roas_data["ROAS"] = roas_data["revenue"] / roas_data["spend"]
+spend = df_b_updated.groupby(["month", "channel"]).agg(spend=("spend", "sum")).reset_index()
+roas_data = pd.merge(acq, spend, left_on=['month', 'attributed_channel'], right_on=['month', 'channel'], how='inner')
+roas_data['CAC'] = roas_data['spend'] / roas_data['new_customers']
+roas_data['ROAS'] = roas_data['revenue'] / roas_data['spend']
 
 # === DASHBOARD ===
 st.title("📊 Business Performance Dashboard — Marketing, Revenue & Customer Insights")
