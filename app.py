@@ -194,7 +194,7 @@ fig.update_layout(
         borderwidth=0
     )
 )
-
+st.plotly_chart(fig, use_container_width=True)
 
 
 st.markdown("---")
