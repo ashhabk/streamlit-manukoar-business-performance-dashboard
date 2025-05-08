@@ -8,32 +8,41 @@ from datetime import datetime
 st.set_page_config(page_title="Manukora Dashboard", layout="wide")
 
 # Then inject your custom CSS
+# Custom styling
 st.markdown("""
     <style>
         .stApp {
-            background: linear-gradient(to bottom right, #ffffff, #f9f9f9);
+            background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
             font-family: 'Segoe UI', sans-serif;
         }
 
-        .metric-container {
-            background-color: #ffffff;
-            padding: 1.2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
-        }
-
-        h2, h3 {
+        h1, h2, h3 {
             color: #f26522 !important;
+            font-weight: 700;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .block-container {
+            padding: 2rem 3rem;
+        }
+
+        .css-1kyxreq, .css-1v0mbdj {
+            background-color: #ffffff !important;
+            border-radius: 10px;
+            padding: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .metric-container {
+            background-color: #fff8f2;
+            border-radius: 8px;
+            padding: 1rem;
         }
     </style>
 """, unsafe_allow_html=True)
+with col1:
+    st.markdown("<div class='metric-container'>", unsafe_allow_html=True)
+    st.metric("Revenue", f"${latest['total_price']:,.2f}", f"{delta_rev:.1%}")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # --- DATA LOAD ---
 df_a = pd.read_csv("data/final_dataset_a.csv")
