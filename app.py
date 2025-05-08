@@ -30,6 +30,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+st.image("assets/background.jpg", caption="Is the background loading?")
 
 
 # --- DATA LOAD ---
