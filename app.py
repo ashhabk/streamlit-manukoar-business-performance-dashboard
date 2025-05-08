@@ -4,6 +4,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
+
+
+st.set_page_config(page_title="Manukora Dashboard", layout="wide")
 # --- DATA LOAD ---
 df_a = pd.read_csv("data/final_dataset_a.csv")
 df_b = pd.read_csv("data/final_dataset_b.csv")
