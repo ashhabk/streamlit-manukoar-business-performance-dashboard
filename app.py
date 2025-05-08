@@ -4,46 +4,38 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
-# === SET PAGE CONFIG ===
+# --- CONFIG ---
 st.set_page_config(page_title="Manukora Dashboard", layout="wide")
 
-# === CUSTOM STYLING ===
+# --- STYLE ---
 st.markdown("""
     <style>
-        body {
-            background-color: #FFF7ED;
-        }
-        .stApp {
-            background-color: #FFF7ED;
-        }
-        .main-title {
-            background-color: #F26522;
-            padding: 1rem 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        .main-title h1 {
-            color: black;
-            font-size: 32px;
-            font-weight: 700;
-            margin: 0;
-        }
-        .metric-block {
-            text-align: center;
-            font-size: 22px;
-        }
-        .rounded-container {
-            background-color: white;
-            padding: 1rem;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-bottom: 1.5rem;
-        }
+    body {
+        background-color: #FFF7ED;
+    }
+    .stApp {
+        background-color: #FFF7ED;
+    }
+    .block-container {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .card {
+        background-color: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .header-box {
+        background-color: #F26522;
+        padding: 20px 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# === DATA LOAD ===
+# --- DATA LOAD ---
 df_a = pd.read_csv("data/final_dataset_a.csv")
 df_b = pd.read_csv("data/final_dataset_b.csv")
 df_a['created_at'] = pd.to_datetime(df_a['created_at'], errors='coerce')
@@ -51,7 +43,17 @@ df_a = df_a.dropna(subset=['created_at'])
 df_a['month'] = df_a['created_at'].dt.to_period("M").astype(str)
 df_b['month'] = pd.to_datetime(df_b['date'], errors='coerce').dt.to_period("M").astype(str)
 
-# === CALCULATE METRICS ===
+# --- HEADER ---
+col_logo, col_title = st.columns([1, 8])
+with col_logo:
+    st.image("assets/logo.png", width=60)
+with col_title:
+    st.markdown(
+        "<div class='header-box'><h1 style='color: black;'>Manukora Business Performance Dashboard</h1></div>",
+        unsafe_allow_html=True
+    )
+
+# --- METRICS ---
 monthly_rev = df_a.groupby("month")["total_price"].sum().reset_index()
 monthly_orders = df_a.groupby("month")["order_id"].count().reset_index(name="orders")
 monthly_new = df_a[df_a["order_rank"] == 1].groupby("month")["customer_id"].nunique().reset_index(name="new_customers")
@@ -62,7 +64,15 @@ delta_rev = (latest["total_price"] - prev["total_price"]) / prev["total_price"]
 delta_orders = (latest["orders"] - prev["orders"]) / prev["orders"]
 delta_newcust = (latest["new_customers"] - prev["new_customers"]) / prev["new_customers"]
 
-# === XYZ CHANNEL SPEND ===
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric("Revenue", f"${latest['total_price']:,.0f}", f"{delta_rev:.1%}")
+with col2:
+    st.metric("New Customers", f"{latest['new_customers']:,.0f}", f"{delta_newcust:.1%}")
+with col3:
+    st.metric("Orders", f"{latest['orders']:,.0f}", f"{delta_orders:.1%}")
+
+# --- ETL ---
 first_orders = df_a[df_a["order_rank"] == 1]
 xyz_orders = df_a[df_a['attributed_channel'] == 'XYZ media']
 xyz_commission = xyz_orders.groupby('month')['total_price'].sum().reset_index()
@@ -73,6 +83,7 @@ xyz_commission['channel'] = 'XYZ media'
 xyz_spend = xyz_commission[['month', 'channel', 'spend']]
 df_b_updated = pd.concat([df_b, xyz_spend], ignore_index=True)
 
+# --- ROAS/CAC ---
 acq = first_orders.groupby(["month", "attributed_channel"]).agg(
     new_customers=("customer_id", "nunique"),
     revenue=("total_price", "sum")
@@ -82,38 +93,14 @@ roas_data = pd.merge(acq, spend, left_on=['month', 'attributed_channel'], right_
 roas_data['CAC'] = roas_data['spend'] / roas_data['new_customers']
 roas_data['ROAS'] = roas_data['revenue'] / roas_data['spend']
 
-# === DISCOUNT LOGIC ===
-def classify_discount(row):
-    if row["total_price"] == 0 and row["discount_amount"] > 0:
-        return "Free Gift"
-    elif row["discount_amount"] > 0:
-        return "Discount Applied"
-    elif row["discount_amount"] == 0 and row["total_price"] > 0:
-        return "No Discount"
-    else:
-        return "Other"
-df_a["discount_status"] = df_a.apply(classify_discount, axis=1)
-discount_impact = df_a.groupby("discount_status").agg(
-    order_count=("order_id", "count"),
-    total_revenue=("total_price", "sum"),
-    avg_order_value=("total_price", "mean")
-).reset_index()
-
-# === RETURNING VS NEW ===
-df_a["customer_type"] = df_a["order_rank"].apply(lambda x: "New" if x == 1 else "Returning")
-revenue_summary = df_a.groupby("customer_type").agg(
-    order_count=("order_id", "count"),
-    total_revenue=("total_price", "sum"),
-    avg_order_value=("total_price", "mean")
-).reset_index()
-
-# === SEGMENTATION ===
+# --- SEGMENTATION ---
 df_a = df_a.sort_values(["customer_id", "created_at"])
 df_a["days_since_last"] = df_a.groupby("customer_id")["created_at"].diff().dt.days
 cust_summary = df_a.groupby("customer_id").agg(
     order_count=("order_id", "count"),
     avg_days_between_orders=("days_since_last", "mean")
 ).reset_index()
+
 def label_segment(row):
     if row["order_count"] == 1:
         return "One-Timer"
@@ -125,87 +112,91 @@ def label_segment(row):
         return "Infrequent Buyer"
     else:
         return "Monthly Buyer"
+
 cust_summary["cluster_label"] = cust_summary.apply(label_segment, axis=1)
 segment_counts = cust_summary["cluster_label"].value_counts().reset_index()
 segment_counts.columns = ["Customer Type", "Count"]
 
-# === TITLE BAR ===
-st.markdown("""
-<div class='main-title'>
-    <h1>Manukora Business Performance Dashboard</h1>
-</div>
-""", unsafe_allow_html=True)
+# --- DISCOUNT ---
+def classify_discount(row):
+    if row["total_price"] == 0 and row["discount_amount"] > 0:
+        return "Free Gift"
+    elif row["discount_amount"] > 0:
+        return "Discount Applied"
+    elif row["discount_amount"] == 0 and row["total_price"] > 0:
+        return "No Discount"
+    else:
+        return "Other"
 
-# === SCORECARDS CENTERED ===
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("Revenue", f"${latest['total_price']:,.0f}", f"{delta_rev:.1%}")
-with col2:
-    st.metric("New Customers", f"{latest['new_customers']:,.0f}", f"{delta_newcust:.1%}")
-with col3:
-    st.metric("Orders", f"{latest['orders']:,.0f}", f"{delta_orders:.1%}")
+df_a["discount_status"] = df_a.apply(classify_discount, axis=1)
+discount_impact = df_a.groupby("discount_status").agg(
+    order_count=("order_id", "count"),
+    total_revenue=("total_price", "sum"),
+    avg_order_value=("total_price", "mean")
+).reset_index()
 
-# === SECTION 2 (3 COL) ===
+# --- NEW VS RETURNING ---
+df_a["customer_type"] = df_a["order_rank"].apply(lambda x: "New" if x == 1 else "Returning")
+revenue_summary = df_a.groupby("customer_type").agg(
+    order_count=("order_id", "count"),
+    total_revenue=("total_price", "sum"),
+    avg_order_value=("total_price", "mean")
+).reset_index()
+
+# --- VISUALIZATION HELPERS ---
+def render_card(fig):
+    return fig.update_layout(
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        font=dict(color="black"),
+        margin=dict(l=10, r=10, t=40, b=20),
+        height=320
+    )
+
+# === ROW 1 ===
 col4, col5, col6 = st.columns(3)
 with col4:
-    with st.container():
-        st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig1 = px.line(roas_data, x="month", y="ROAS", color="attributed_channel", title="ROAS Trend by Channel")
-        st.plotly_chart(fig1, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    fig1 = px.line(roas_data, x="month", y="ROAS", color="attributed_channel", title="ROAS Trend by Channel")
+    st.plotly_chart(render_card(fig1), use_container_width=True)
 with col5:
-    with st.container():
-        st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig2 = px.line(roas_data, x="month", y="CAC", color="attributed_channel", title="Customer Acquisition Cost (CAC)")
-        st.plotly_chart(fig2, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    fig2 = px.line(roas_data, x="month", y="CAC", color="attributed_channel", title="Customer Acquisition Cost (CAC)")
+    st.plotly_chart(render_card(fig2), use_container_width=True)
 with col6:
-    with st.container():
-        st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig3 = px.pie(segment_counts, names="Customer Type", values="Count", hole=0.4, title="Customer Segmentation")
-        st.plotly_chart(fig3, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    fig3 = px.pie(segment_counts, names="Customer Type", values="Count", hole=0.4, title="Customer Segmentation")
+    st.plotly_chart(render_card(fig3), use_container_width=True)
 
-# === SECTION 3 (3 COL) ===
+# === ROW 2 ===
 col7, col8, col9 = st.columns(3)
 with col7:
-    with st.container():
-        st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig4 = px.bar(first_orders.groupby("attributed_channel")["customer_id"].nunique().reset_index(name="new_customers"),
-                      x="attributed_channel", y="new_customers", title="New Customers by Channel", text_auto=True)
-        st.plotly_chart(fig4, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    fig4 = px.bar(first_orders.groupby("attributed_channel")["customer_id"].nunique().reset_index(name="new_customers"),
+                  x="attributed_channel", y="new_customers", title="New Customers by Channel",
+                  text_auto=".2s", color_discrete_sequence=["#F26522"])
+    st.plotly_chart(render_card(fig4), use_container_width=True)
 with col8:
-    with st.container():
-        st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Avg Order Value by Discount", text_auto=True)
-        st.plotly_chart(fig5, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Average Order Value by Discount",
+                  text_auto=".2f", color_discrete_sequence=["#F26522"])
+    st.plotly_chart(render_card(fig5), use_container_width=True)
 with col9:
-    with st.container():
-        st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig6 = px.bar(revenue_summary, x="customer_type", y="total_revenue", title="Revenue: New vs Returning", text_auto=True)
-        st.plotly_chart(fig6, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    fig6 = px.bar(revenue_summary, x="customer_type", y="total_revenue", title="Revenue: New vs. Returning",
+                  text_auto=".2s", color_discrete_sequence=["#F26522"])
+    st.plotly_chart(render_card(fig6), use_container_width=True)
 
-# === MONTHLY CHART ===
-fig = go.Figure()
-fig.add_trace(go.Bar(x=summary['month'], y=summary['total_price'], name='Revenue', marker_color='#F26522', yaxis='y'))
-fig.add_trace(go.Scatter(x=summary['month'], y=summary['orders'], mode='lines+markers', name='Orders', yaxis='y2'))
-fig.add_trace(go.Scatter(x=summary['month'], y=summary['new_customers'], mode='lines+markers', name='New Customers', yaxis='y2'))
-fig.update_layout(
-    title='📈 Monthly Revenue, Orders, and New Customers',
-    xaxis=dict(title='Month'),
-    yaxis=dict(title='Revenue (USD)'),
-    yaxis2=dict(title='Orders / Customers', overlaying='y', side='right'),
-    height=500,
-    plot_bgcolor="white",
+# === ROW 3 ===
+fig7 = go.Figure()
+fig7.add_trace(go.Bar(x=summary["month"], y=summary["total_price"], name="Revenue", marker_color="#F26522", yaxis="y"))
+fig7.add_trace(go.Scatter(x=summary["month"], y=summary["orders"], mode="lines+markers", name="Orders", yaxis="y2"))
+fig7.add_trace(go.Scatter(x=summary["month"], y=summary["new_customers"], mode="lines+markers", name="New Customers", yaxis="y2"))
+fig7.update_layout(
+    title="📈 Monthly Revenue, Orders, and New Customers",
+    xaxis=dict(title="Month"),
+    yaxis=dict(title="Revenue (USD)", showgrid=False),
+    yaxis2=dict(title="Orders / Customers", overlaying="y", side="right", showgrid=False),
+    legend=dict(title="Metric", x=1.05, y=1, xanchor="left", yanchor="top"),
     paper_bgcolor="white",
-    legend=dict(x=1.02, y=1)
+    plot_bgcolor="white",
+    height=450
 )
-st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-st.plotly_chart(fig, use_container_width=True)
-st.markdown("</div>", unsafe_allow_html=True)
+st.plotly_chart(fig7, use_container_width=True)
 
 # === FOOTER ===
 st.markdown("---")
