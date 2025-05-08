@@ -146,36 +146,36 @@ with col9:
 # --- Row 3: Trends Monthly ---
 fig = go.Figure()
 
-# Bar for Revenue
+# Revenue (bar)
 fig.add_trace(go.Bar(
     x=summary['month'],
     y=summary['total_price'],
     name='Revenue',
-    marker=dict(color='#FF7F0E'),
+    marker_color='#2ECC71',  # Emerald Green
     yaxis='y'
 ))
 
-# Line for Orders
+# Orders (line)
 fig.add_trace(go.Scatter(
     x=summary['month'],
     y=summary['orders'],
     mode='lines+markers',
     name='Orders',
-    marker_color='#008080',
+    marker=dict(color='#5D3FD3'),  # Indigo
     yaxis='y2'
 ))
 
-# Line for New Customers
+# New Customers (line)
 fig.add_trace(go.Scatter(
     x=summary['month'],
     y=summary['new_customers'],
     mode='lines+markers',
     name='New Customers',
-    marker=dict(color='#1F77B4'),
+    marker=dict(color='#E74C3C'),  # Crimson Rose
     yaxis='y2'
 ))
 
-# Layout styling
+# Layout
 fig.update_layout(
     title='📈 Monthly Revenue, Orders, and Customer Growth',
     xaxis=dict(title='Month'),
@@ -187,6 +187,7 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
 
 st.markdown("---")
 st.caption("Made by Ashhab K • Case Study: Manukora BI Analyst • Built with ❤️ using Streamlit")
