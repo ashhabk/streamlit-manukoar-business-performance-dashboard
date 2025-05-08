@@ -134,10 +134,10 @@ with col6:
 # --- Row 2 ---
 col7, col8, col9 = st.columns(3)
 with col7:
-    fig4 = px.bar(first_order_channel, x="attributed_channel", y="new_customers", title="New Customers by Channel", text_auto=".2s")
+    fig4 = px.bar(first_order_channel, x="attributed_channel", y="new_customers", title="New Customers by Channel", text_auto=".2s", color_discrete_sequence=['#FF7F0E'])
     st.plotly_chart(fig4, use_container_width=True)
 with col8:
-    fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Average Order Value by Discount", text_auto=".2f")
+    fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Average Order Value by Discount", text_auto=".2f", color_discrete_sequence=['#008080'])
     st.plotly_chart(fig5, use_container_width=True)
 with col9:
     fig6 = px.bar(revenue_summary, x="customer_type", y="total_revenue", title="Revenue: New vs. Returning", text_auto=".2s")
