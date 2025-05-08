@@ -174,11 +174,11 @@ with col7:
     st.plotly_chart(render_card(fig4), use_container_width=True)
 with col8:
     fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Average Order Value by Discount",
-                  text_auto=".2f", color_discrete_sequence=["#F26522"])
+                  text_auto=".2f", color_discrete_sequence=["#F22222"])
     st.plotly_chart(render_card(fig5), use_container_width=True)
 with col9:
     fig6 = px.bar(revenue_summary, x="customer_type", y="total_revenue", title="Revenue: New vs. Returning",
-                  text_auto=".2s", color_discrete_sequence=["#F26522"])
+                  text_auto=".2s", color_discrete_sequence=["#F25542"])
     st.plotly_chart(render_card(fig6), use_container_width=True)
 
 # === ROW 3 ===
