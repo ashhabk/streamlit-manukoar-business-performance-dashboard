@@ -9,6 +9,15 @@ st.title("📊 Manukora Marketing & Customer Dashboard")
 
 # Load data
 df_a = pd.read_csv("data/final_dataset_a.csv")
+
+# Explicitly convert `created_at` to datetime, handle errors safely
+df_a['created_at'] = pd.to_datetime(df_a['created_at'], errors='coerce')
+
+# Drop rows where date conversion failed (optional, depending on your use case)
+df_a = df_a.dropna(subset=['created_at'])
+
+# Now continue
+df_a['month'] = df_a['created_at'].dt.to_period('M').astype(str)
 df_b = pd.read_csv("data/final_dataset_b.csv")
 
 # === Preprocessing ===
