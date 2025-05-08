@@ -199,7 +199,7 @@ fig.update_layout(
     yaxis2=dict(title='Orders / Customers', overlaying='y', side='right', showgrid=False),
     plot_bgcolor="white",
     paper_bgcolor="white",
-    height=500,
+    height=300,
     legend=dict(title='Metric', x=1.05, y=1)
 )
 st.plotly_chart(fig, use_container_width=True)
