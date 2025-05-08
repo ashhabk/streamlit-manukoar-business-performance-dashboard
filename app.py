@@ -163,7 +163,7 @@ with col5:
 with col6:
     with st.container():
         fig3 = px.pie(segment_counts, names="Customer Type", values="Count", hole=0.4, title="Customer Segmentation")
-        fig3.update_layout(paper_bgcolor="white",height=300)
+        fig3.update_layout(paper_bgcolor="white")
         st.plotly_chart(fig3, use_container_width=True)
 
 # === ROW 2 ===
