@@ -157,6 +157,12 @@ roas_data['CAC'] = roas_data['spend'] / roas_data['new_customers']
 roas_data['ROAS'] = roas_data['revenue'] / roas_data['spend']
 
 # === DASHBOARD ===
+col_logo, col_title = st.columns([1, 6])
+with col_logo:
+    st.image("assets/logo.png", width=60)  # adjust size if needed
+with col_title:
+    st.markdown("## <b>Manukora Business Performance Dashboard</b>", unsafe_allow_html=True)
+
 st.title("📊 Manukora Business Performance Dashboard")
 
 # Scorecards
