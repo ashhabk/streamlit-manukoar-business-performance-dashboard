@@ -144,16 +144,49 @@ with col9:
     st.plotly_chart(fig6, use_container_width=True)
 
 # --- Row 3: Trends Monthly ---
-col10, col11, col12 = st.columns(3)
-with col10:
-    fig7 = px.bar(summary, x="month", y="total_price", title="Monthly Revenue")
-    st.plotly_chart(fig7, use_container_width=True)
-with col11:
-    fig8 = px.bar(summary, x="month", y="new_customers", title="Monthly New Customers")
-    st.plotly_chart(fig8, use_container_width=True)
-with col12:
-    fig9 = px.bar(summary, x="month", y="orders", title="Monthly Orders")
-    st.plotly_chart(fig9, use_container_width=True)
+ig = go.Figure()
+
+# Bar for Revenue
+fig.add_trace(go.Bar(
+    x=summary['month'],
+    y=summary['total_price'],
+    name='Revenue',
+    marker_color='#008080',
+    yaxis='y'
+))
+
+# Line for Orders
+fig.add_trace(go.Scatter(
+    x=summary['month'],
+    y=summary['orders'],
+    mode='lines+markers',
+    name='Orders',
+    marker=dict(color='#1F77B4'),
+    yaxis='y2'
+))
+
+# Line for New Customers
+fig.add_trace(go.Scatter(
+    x=summary['month'],
+    y=summary['new_customers'],
+    mode='lines+markers',
+    name='New Customers',
+    marker=dict(color='#FF7F0E'),
+    yaxis='y2'
+))
+
+# Layout styling
+fig.update_layout(
+    title='📈 Monthly Revenue, Orders, and Customer Growth',
+    xaxis=dict(title='Month'),
+    yaxis=dict(title='Revenue (USD)', showgrid=False),
+    yaxis2=dict(title='Orders / New Customers', overlaying='y', side='right', showgrid=False),
+    template='plotly_white',
+    legend=dict(title='Metric', borderwidth=1, bordercolor="#ccc"),
+    height=500
+)
+
+st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
 st.caption("Made by Ashhab K • Case Study: Manukora BI Analyst • Built with ❤️ using Streamlit")
