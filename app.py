@@ -3,9 +3,13 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-# === Load Cleaned Datasets ===
-df_a = pd.read_csv('final_dataset_a.csv', parse_dates=['created_at'])
-df_b = pd.read_csv('final_dataset_b.csv')
+# Page setup
+st.set_page_config(page_title="Manukora BI Dashboard", layout="wide")
+st.title("📊 Manukora Marketing & Customer Dashboard")
+
+# Load data
+df_a = pd.read_csv("data/final_dataset_a.csv")
+df_b = pd.read_csv("data/final_dataset_b.csv")
 
 # === Preprocessing ===
 df_a['month'] = df_a['created_at'].dt.to_period('M').astype(str)
