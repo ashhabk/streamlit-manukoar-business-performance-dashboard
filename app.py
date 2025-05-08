@@ -19,46 +19,18 @@ st.markdown(
         }
 
         .stApp {
-            background-color: rgba(255, 255, 255, 0.8); /* semi-transparent white */
+            background-color: rgba(255, 255, 255, 0.85);  /* translucent white overlay */
+            backdrop-filter: blur(2px);  /* Optional blur for nice effect */
+        }
+
+        section.main > div {
+            background-color: transparent !important;
         }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-
-# Then inject your custom CSS
-# Custom styling
-st.markdown("""
-    <style>
-        .stApp {
-            background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        h1, h2, h3 {
-            color: #f26522 !important;
-            font-weight: 700;
-        }
-
-        .block-container {
-            padding: 2rem 3rem;
-        }
-
-        .css-1kyxreq, .css-1v0mbdj {
-            background-color: #ffffff !important;
-            border-radius: 10px;
-            padding: 1.2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        .metric-container {
-            background-color: #fff8f2;
-            border-radius: 8px;
-            padding: 1rem;
-        }
-    </style>
-""", unsafe_allow_html=True)
 
 # --- DATA LOAD ---
 df_a = pd.read_csv("data/final_dataset_a.csv")
