@@ -151,19 +151,19 @@ col4, col5, col6 = st.columns(3)
 with col4:
     with st.container():
         fig1 = px.line(roas_data, x="month", y="ROAS", color="attributed_channel", title="ROAS Trend by Channel")
-        fig1.update_layout(paper_bgcolor="white", plot_bgcolor="white")
+        fig1.update_layout(paper_bgcolor="white",height=300, plot_bgcolor="white")
         st.plotly_chart(fig1, use_container_width=True)
 
 with col5:
     with st.container():
         fig2 = px.line(roas_data, x="month", y="CAC", color="attributed_channel", title="Customer Acquisition Cost (CAC)")
-        fig2.update_layout(paper_bgcolor="white", plot_bgcolor="white")
+        fig2.update_layout(paper_bgcolor="white", height=300,plot_bgcolor="white")
         st.plotly_chart(fig2, use_container_width=True)
 
 with col6:
     with st.container():
         fig3 = px.pie(segment_counts, names="Customer Type", values="Count", hole=0.4, title="Customer Segmentation")
-        fig3.update_layout(paper_bgcolor="white")
+        fig3.update_layout(paper_bgcolor="white",height=300)
         st.plotly_chart(fig3, use_container_width=True)
 
 # === ROW 2 ===
@@ -172,19 +172,19 @@ with col7:
     fig4 = px.bar(first_orders.groupby("attributed_channel")["customer_id"].nunique().reset_index(name="new_customers"),
                   x="attributed_channel", y="new_customers", title="New Customers by Channel", text_auto=".2s",
                   color_discrete_sequence=["#FFC300"])
-    fig4.update_layout(paper_bgcolor="white", plot_bgcolor="white")
+    fig4.update_layout(paper_bgcolor="white",height=300, plot_bgcolor="white")
     st.plotly_chart(fig4, use_container_width=True)
 
 with col8:
     fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Average Order Value by Discount", text_auto=".2f",
                   color_discrete_sequence=["#581845"])
-    fig5.update_layout(paper_bgcolor="white", plot_bgcolor="white")
+    fig5.update_layout(paper_bgcolor="white",height=300, plot_bgcolor="white")
     st.plotly_chart(fig5, use_container_width=True)
 
 with col9:
     fig6 = px.bar(revenue_summary, x="customer_type", y="total_revenue", title="Revenue: New vs. Returning", text_auto=".2s",
                   color_discrete_sequence=["#F26522"])
-    fig6.update_layout(paper_bgcolor="white", plot_bgcolor="white")
+    fig6.update_layout(paper_bgcolor="white",height=300, plot_bgcolor="white")
     st.plotly_chart(fig6, use_container_width=True)
 
 # === ROW 3: Combined Monthly Trends ===
