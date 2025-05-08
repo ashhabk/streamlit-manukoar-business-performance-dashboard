@@ -144,7 +144,7 @@ with col9:
     st.plotly_chart(fig6, use_container_width=True)
 
 # --- Row 3: Trends Monthly ---
-ig = go.Figure()
+fig = go.Figure()
 
 # Bar for Revenue
 fig.add_trace(go.Bar(
