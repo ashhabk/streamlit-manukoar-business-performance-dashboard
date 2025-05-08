@@ -156,14 +156,20 @@ roas_data = pd.merge(acq, spend, left_on=['month', 'attributed_channel'], right_
 roas_data['CAC'] = roas_data['spend'] / roas_data['new_customers']
 roas_data['ROAS'] = roas_data['revenue'] / roas_data['spend']
 
-# === DASHBOARD ===
+# === DASHBOARD HEADER ===
 col_logo, col_title = st.columns([1, 6])
 with col_logo:
-    st.image("assets/logo.png", width=60)  # adjust size if needed
-with col_title:
-    st.markdown("## <b>Manukora Business Performance Dashboard</b>", unsafe_allow_html=True)
+    st.image("assets/logo.png", width=60)
 
-st.title("📊 Manukora Business Performance Dashboard")
+with col_title:
+    st.markdown(
+        """
+        <h1 style='font-size: 38px; font-weight: 900; color: #f06529; margin-top: 10px;'>
+            Manukora Business Performance Dashboard
+        </h1>
+        """,
+        unsafe_allow_html=True
+    )
 
 # Scorecards
 col1, col2, col3 = st.columns(3)
