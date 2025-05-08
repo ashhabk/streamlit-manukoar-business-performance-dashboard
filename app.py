@@ -145,7 +145,22 @@ def label_segment(row):
 cust_summary["cluster_label"] = cust_summary.apply(label_segment, axis=1)
 segment_counts = cust_summary["cluster_label"].value_counts().reset_index()
 segment_counts.columns = ["Customer Type", "Count"]
-
+# === ROW 3: Combined Monthly Trends ===
+fig = go.Figure()
+fig.add_trace(go.Bar(x=summary['month'], y=summary['total_price'], name='Revenue', marker_color='#FFC301', yaxis='y'))
+fig.add_trace(go.Scatter(x=summary['month'], y=summary['orders'], mode='lines+markers', name='Orders', marker=dict(color='#2E86AB'), yaxis='y2'))
+fig.add_trace(go.Scatter(x=summary['month'], y=summary['new_customers'], mode='lines+markers', name='New Customers', marker=dict(color='#D7263D'), yaxis='y2'))
+fig.update_layout(
+    title='📈 Monthly Revenue, Orders, and New Customers',
+    xaxis=dict(title='Month'),
+    yaxis=dict(title='Revenue (USD)', showgrid=False),
+    yaxis2=dict(title='Orders / Customers', overlaying='y', side='right', showgrid=False),
+    plot_bgcolor="white",
+    paper_bgcolor="white",
+    height=400,
+    legend=dict(title='Metric', x=1.05, y=1)
+)
+st.plotly_chart(fig, use_container_width=True)
 # === ROW 1 ===
 col4, col5, col6 = st.columns(3)
 with col4:
@@ -187,22 +202,6 @@ with col9:
     fig6.update_layout(paper_bgcolor="white", plot_bgcolor="white")
     st.plotly_chart(fig6, use_container_width=True)
 
-# === ROW 3: Combined Monthly Trends ===
-fig = go.Figure()
-fig.add_trace(go.Bar(x=summary['month'], y=summary['total_price'], name='Revenue', marker_color='#FFC301', yaxis='y'))
-fig.add_trace(go.Scatter(x=summary['month'], y=summary['orders'], mode='lines+markers', name='Orders', marker=dict(color='#2E86AB'), yaxis='y2'))
-fig.add_trace(go.Scatter(x=summary['month'], y=summary['new_customers'], mode='lines+markers', name='New Customers', marker=dict(color='#D7263D'), yaxis='y2'))
-fig.update_layout(
-    title='📈 Monthly Revenue, Orders, and New Customers',
-    xaxis=dict(title='Month'),
-    yaxis=dict(title='Revenue (USD)', showgrid=False),
-    yaxis2=dict(title='Orders / Customers', overlaying='y', side='right', showgrid=False),
-    plot_bgcolor="white",
-    paper_bgcolor="white",
-    height=400,
-    legend=dict(title='Metric', x=1.05, y=1)
-)
-st.plotly_chart(fig, use_container_width=True)
 
 # === FOOTER ===
 st.markdown("---")
