@@ -10,16 +10,22 @@ st.set_page_config(page_title="Manukora Dashboard", layout="wide")
 st.markdown(
     """
     <style>
-        .stApp {
-            background-image: url('assets/background.jpg');
+        body {
+            background-image: url("assets/background.jpg");
             background-size: cover;
-            background-attachment: fixed;
             background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .stApp {
+            background-color: rgba(255, 255, 255, 0.8); /* semi-transparent white */
         }
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 # Then inject your custom CSS
 # Custom styling
