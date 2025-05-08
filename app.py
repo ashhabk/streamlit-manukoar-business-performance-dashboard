@@ -143,4 +143,3 @@ with col12:
 
 st.markdown("---")
 st.caption("Made by Ashhab K • Case Study: Manukora BI Analyst • Built with ❤️ using Streamlit")
-''')
