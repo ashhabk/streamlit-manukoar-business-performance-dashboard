@@ -182,11 +182,19 @@ fig.update_layout(
     yaxis=dict(title='Revenue (USD)', showgrid=False),
     yaxis2=dict(title='Orders / New Customers', overlaying='y', side='right', showgrid=False),
     template='plotly_white',
-    legend=dict(title='Metric', borderwidth=1, bordercolor="#ccc"),
-    height=500
+    height=500,
+    legend=dict(
+        title='Metric',
+        orientation='v',
+        x=1.05,   # move legend to the right outside chart
+        y=1,
+        xanchor='left',
+        yanchor='top',
+        bgcolor='rgba(255,255,255,0)',
+        borderwidth=0
+    )
 )
 
-st.plotly_chart(fig, use_container_width=True)
 
 
 st.markdown("---")
