@@ -189,7 +189,7 @@ with col9:
 
 # === ROW 3: Combined Monthly Trends ===
 fig = go.Figure()
-fig.add_trace(go.Bar(x=summary['month'], y=summary['total_price'], name='Revenue', marker_color='#F26522', yaxis='y'))
+fig.add_trace(go.Bar(x=summary['month'], y=summary['total_price'], name='Revenue', marker_color='#FFC301', yaxis='y'))
 fig.add_trace(go.Scatter(x=summary['month'], y=summary['orders'], mode='lines+markers', name='Orders', marker=dict(color='#2E86AB'), yaxis='y2'))
 fig.add_trace(go.Scatter(x=summary['month'], y=summary['new_customers'], mode='lines+markers', name='New Customers', marker=dict(color='#D7263D'), yaxis='y2'))
 fig.update_layout(
