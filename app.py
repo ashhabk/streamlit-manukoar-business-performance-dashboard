@@ -178,7 +178,7 @@ with col7:
 with col8:
     with st.container():
         st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Avg Order Value by Discount", text_auto=True)
+        fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Avg Order Value by Discount", text_auto=True, marker_color='#F26522')
         st.plotly_chart(fig5, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 with col9:
