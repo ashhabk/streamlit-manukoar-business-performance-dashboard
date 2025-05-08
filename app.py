@@ -169,24 +169,18 @@ with col6:
 # === SECTION 3 (3 COL) ===
 col7, col8, col9 = st.columns(3)
 with col7:
-    with st.container():
-        st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig4 = px.bar(first_orders.groupby("attributed_channel")["customer_id"].nunique().reset_index(name="new_customers"),
-                      x="attributed_channel", y="new_customers", title="New Customers by Channel", text_auto=True)
-        st.plotly_chart(fig4, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    fig4 = px.bar(first_orders.groupby("attributed_channel")["customer_id"].nunique().reset_index(name="new_customers"),
+                  x="attributed_channel", y="new_customers", title="New Customers by Channel", color_discrete_sequence=[primary_color])
+    fig4.update_layout(plot_bgcolor=chart_background, paper_bgcolor=chart_background)
+    st.plotly_chart(fig4, use_container_width=True)
 with col8:
-    with st.container():
-        st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Avg Order Value by Discount", text_auto=True, marker_color='#F26522')
-        st.plotly_chart(fig5, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Average Order Value by Discount", text_auto=".2f", color_discrete_sequence=[primary_color])
+    fig5.update_layout(plot_bgcolor=chart_background, paper_bgcolor=chart_background)
+    st.plotly_chart(fig5, use_container_width=True)
 with col9:
-    with st.container():
-        st.markdown("<div class='rounded-container'>", unsafe_allow_html=True)
-        fig6 = px.bar(revenue_summary, x="customer_type", y="total_revenue", title="Revenue: New vs Returning", text_auto=True)
-        st.plotly_chart(fig6, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    fig6 = px.bar(revenue_summary, x="customer_type", y="total_revenue", title="Revenue: New vs. Returning", text_auto=".2s", color_discrete_sequence=[primary_color])
+    fig6.update_layout(plot_bgcolor=chart_background, paper_bgcolor=chart_background)
+    st.plotly_chart(fig6, use_container_width=True)
 
 # === MONTHLY CHART ===
 fig = go.Figure()
