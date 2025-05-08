@@ -1,51 +1,64 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
-st.set_page_config(page_title="Manukora BI Dashboard", layout="wide")
+# === Load your data ===
+df_a = pd.read_csv("data/dataset_a_clean.csv")
+df_b = pd.read_csv("data/dataset_b_clean.csv")
+
+# === Monthly aggregations ===
+df_a['month'] = pd.to_datetime(df_a['created_at']).dt.to_period('M').astype(str)
+monthly_summary = df_a.groupby('month').agg({
+    'total_price': 'sum',
+    'order_id': 'count',
+    'customer_id': pd.Series.nunique
+}).reset_index().rename(columns={
+    'total_price': 'revenue',
+    'order_id': 'orders',
+    'customer_id': 'new_customers'
+})
+
+# === Current Month vs Previous ===
+current = monthly_summary.iloc[-1]
+previous = monthly_summary.iloc[-2]
+
+def calc_change(current, previous):
+    return round((current - previous) / previous * 100, 1)
+
+revenue_change = calc_change(current.revenue, previous.revenue)
+orders_change = calc_change(current.orders, previous.orders)
+customers_change = calc_change(current.new_customers, previous.new_customers)
+
+# === Dashboard ===
+st.set_page_config(layout="wide")
 st.title("📊 Manukora Marketing & Customer Dashboard")
 
-df_a = pd.read_csv("data/final_dataset_a.csv")
-df_b = pd.read_csv("data/final_dataset_b.csv")
-
-df_a['created_at'] = pd.to_datetime(df_a['created_at'])
-df_a['month'] = df_a['created_at'].dt.to_period('M').astype(str)
-df_b['date'] = pd.to_datetime(df_b['date'])
-df_b['month'] = df_b['date'].dt.to_period('M').astype(str)
-
-monthly_summary = df_a.groupby('month').agg(
-    revenue=('total_price', 'sum'),
-    orders=('order_id', 'count'),
-    new_customers=('customer_id', 'nunique')
-).reset_index()
-
-st.subheader("📌 Monthly KPIs")
+# === Top KPIs ===
 col1, col2, col3 = st.columns(3)
-if len(monthly_summary) > 1:
-    current = monthly_summary.iloc[-1]
-    previous = monthly_summary.iloc[-2]
-    def growth(val, prev):
-        if prev == 0: return "N/A"
-        return f"{((val - prev) / prev) * 100:.1f}%"
-    col1.metric("Revenue", f"${current['revenue']:,.2f}", growth(current['revenue'], previous['revenue']))
-    col2.metric("Orders", f"{current['orders']:,}", growth(current['orders'], previous['orders']))
-    col3.metric("New Customers", f"{current['new_customers']:,}", growth(current['new_customers'], previous['new_customers']))
+with col1:
+    st.metric("Revenue", f"${current.revenue:,.2f}", f"{revenue_change}%")
+with col2:
+    st.metric("Orders", f"{current.orders:,}", f"{orders_change}%")
+with col3:
+    st.metric("New Customers", f"{current.new_customers:,}", f"{customers_change}%")
 
+# === Trends ===
 st.subheader("📈 Monthly Trends")
 fig = go.Figure()
-fig.add_trace(go.Scatter(x=monthly_summary['month'], y=monthly_summary['revenue'], mode='lines+markers', name='Revenue'))
-fig.add_trace(go.Scatter(x=monthly_summary['month'], y=monthly_summary['orders'], mode='lines+markers', name='Orders'))
-fig.add_trace(go.Scatter(x=monthly_summary['month'], y=monthly_summary['new_customers'], mode='lines+markers', name='New Customers'))
-fig.update_layout(height=450, template='plotly_white', legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
+fig.add_trace(go.Scatter(x=monthly_summary['month'], y=monthly_summary['revenue'], name='Revenue', mode='lines+markers'))
+fig.add_trace(go.Scatter(x=monthly_summary['month'], y=monthly_summary['orders'], name='Orders', mode='lines+markers'))
+fig.add_trace(go.Scatter(x=monthly_summary['month'], y=monthly_summary['new_customers'], name='New Customers', mode='lines+markers'))
+fig.update_layout(height=400, template='plotly_white', legend=dict(orientation="h"))
 st.plotly_chart(fig, use_container_width=True)
 
-st.subheader("📤 Attribution Breakdown (First Orders)")
-first_orders = df_a[df_a['order_rank'] == 1]
-channel_summary = first_orders.groupby('attributed_channel').agg(
-    new_customers=('customer_id', 'nunique'),
-    revenue=('total_price', 'sum')
-).reset_index().sort_values(by='new_customers', ascending=False)
-st.dataframe(channel_summary)
+# === Attribution Breakdown ===
+st.subheader("📌 Attribution Breakdown (First Orders)")
+first_order = df_a[df_a['order_rank'] == 1]
+channel_summary = first_order.groupby('attributed_channel').agg({
+    'customer_id': 'nunique',
+    'total_price': 'sum'
+}).reset_index().rename(columns={'customer_id': 'new_customers', 'total_price': 'revenue'}).sort_values(by='revenue', ascending=False)
+st.dataframe(channel_summary, use_container_width=True)
 
-st.markdown("Made with ❤️ using Streamlit | Case Study: Manukora BI Analyst")
+st.caption("Made with ❤️ using Streamlit | Case Study: Manukora BI Analyst")
