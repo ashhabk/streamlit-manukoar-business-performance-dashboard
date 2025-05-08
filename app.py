@@ -146,12 +146,6 @@ roas_data['ROAS'] = roas_data['revenue'] / roas_data['spend']
 st.title("📊 Manukora Business Performance Dashboard")
 
 # Scorecards
-st.markdown("### 📌 Monthly KPIs")
-with col1:
-    st.markdown("<div class='metric-container'>", unsafe_allow_html=True)
-    st.metric("Revenue", f"${latest['total_price']:,.2f}", f"{delta_rev:.1%}")
-    st.markdown("</div>", unsafe_allow_html=True)
-
 col1, col2, col3 = st.columns(3)
 col1.metric("This Month's Revenue", f"${latest['total_price']:,.0f}", f"{delta_rev:.1%}")
 col2.metric("New Customers This Month", f"{latest['new_customers']:,.0f}", f"{delta_newcust:.1%}")
