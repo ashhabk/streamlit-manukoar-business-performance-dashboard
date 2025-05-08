@@ -4,7 +4,41 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
+# Inject CSS styling for soft gradient and card shadows
+st.markdown("""
+    <style>
+        /* === Background color & layout === */
+        .stApp {
+            background: linear-gradient(to bottom right, #ffffff, #f9f9f9);
+            font-family: 'Segoe UI', sans-serif;
+        }
 
+        /* === Custom card styling === */
+        .block-container {
+            padding-top: 2rem;
+        }
+
+        .metric-container {
+            background-color: #ffffff;
+            padding: 1.2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        /* === Custom section headers === */
+        h2, h3 {
+            color: #f26522 !important;
+        }
+
+        /* === Logo spacing === */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 st.set_page_config(page_title="Manukora Dashboard", layout="wide")
 # --- DATA LOAD ---
@@ -110,7 +144,7 @@ roas_data['CAC'] = roas_data['spend'] / roas_data['new_customers']
 roas_data['ROAS'] = roas_data['revenue'] / roas_data['spend']
 
 # === DASHBOARD ===
-st.title("📊 Business Performance Dashboard — Marketing, Revenue & Customer Insights")
+st.title("📊 Manukora Business Performance Dashboard")
 
 # Scorecards
 st.markdown("### 📌 Monthly KPIs")
