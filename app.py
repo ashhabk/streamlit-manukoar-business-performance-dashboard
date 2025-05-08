@@ -171,7 +171,7 @@ col7, col8, col9 = st.columns(3)
 with col7:
     fig4 = px.bar(first_orders.groupby("attributed_channel")["customer_id"].nunique().reset_index(name="new_customers"),
                   x="attributed_channel", y="new_customers", title="New Customers by Channel", text_auto=".2s",
-                  color_discrete_sequence=["#F26522"])
+                  color_discrete_sequence=["#FFC300"])
     fig4.update_layout(paper_bgcolor="white", plot_bgcolor="white")
     st.plotly_chart(fig4, use_container_width=True)
 
