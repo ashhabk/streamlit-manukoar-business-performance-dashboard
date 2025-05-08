@@ -151,7 +151,7 @@ fig.add_trace(go.Bar(
     x=summary['month'],
     y=summary['total_price'],
     name='Revenue',
-    marker=dict(color='#1F77B4'),
+    marker=dict(color='#FF7F0E'),
     yaxis='y'
 ))
 
@@ -171,7 +171,7 @@ fig.add_trace(go.Scatter(
     y=summary['new_customers'],
     mode='lines+markers',
     name='New Customers',
-    marker=dict(color='#FF7F0E'),
+    marker=dict(color='#1F77B4'),
     yaxis='y2'
 ))
 
