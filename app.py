@@ -177,7 +177,7 @@ with col7:
 
 with col8:
     fig5 = px.bar(discount_impact, x="discount_status", y="avg_order_value", title="Average Order Value by Discount", text_auto=".2f",
-                  color_discrete_sequence=["#F26522"])
+                  color_discrete_sequence=["#581845"])
     fig5.update_layout(paper_bgcolor="white", plot_bgcolor="white")
     st.plotly_chart(fig5, use_container_width=True)
 
